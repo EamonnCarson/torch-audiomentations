@@ -4,6 +4,7 @@ from typing import Text, Union
 import torch
 import torchaudio
 from torch import Tensor
+import torchcodec
 
 import math
 
@@ -89,17 +90,9 @@ class Audio:
     @staticmethod
     def get_audio_metadata(file_path: Union[str, Path]) -> tuple:
         """Return (num_samples, sample_rate)."""
-        info = torchaudio.info(str(file_path))
-        # Deal with backwards-incompatible signature change.
-        # See https://github.com/pytorch/audio/issues/903 for more information.
-        if type(info) is tuple:
-            si, ei = info
-            num_samples = si.length
-            sample_rate = si.rate
-        else:
-            num_samples = info.num_frames
-            sample_rate = info.sample_rate
-        return num_samples, sample_rate
+        decoder = torchcodec.decoders.AudioDecoder(str(file_path))
+        metadata = decoder.metadata
+        return metadata.num_frames, metadata.sample_rate
 
     def get_num_samples(self, file: AudioFile) -> int:
         """Number of samples (in target sample rate)
