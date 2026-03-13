@@ -92,7 +92,7 @@ class Audio:
         """Return (num_samples, sample_rate)."""
         decoder = torchcodec.decoders.AudioDecoder(str(file_path))
         metadata = decoder.metadata
-        return metadata.num_frames, metadata.sample_rate
+        return int(metadata.duration_seconds_from_header * metadata.sample_rate), metadata.sample_rate
 
     def get_num_samples(self, file: AudioFile) -> int:
         """Number of samples (in target sample rate)
